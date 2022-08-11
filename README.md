@@ -1,14 +1,14 @@
-# @react-native-seoul/kakao-login
+# react-native-kakao-sdk
 
 <img src="image/main_banner.png" width="100%" height="auto" />
 
-[![VERSION](http://img.shields.io/npm/v/@react-native-seoul/kakao-login.svg?style=flat-square)](https://npmjs.org/package/@react-native-seoul/kakao-login)
-[![DOWNLOAD](http://img.shields.io/npm/dm/@react-native-seoul/kakao-login.svg?style=flat-square)](https://npmjs.org/package/@react-native-seoul/kakao-login)
-[![LICENSE](http://img.shields.io/npm/l/@react-native-seoul/kakao-login.svg?style=flat-square)](https://npmjs.org/package/@react-native-seoul/kakao-login)
-[![CI](https://github.com/react-native-seoul/react-native-kakao-login/actions/workflows/ci.yml/badge.svg)](https://github.com/react-native-seoul/react-native-kakao-login/actions/workflows/ci.yml)
-[![publish-package](https://github.com/react-native-seoul/react-native-kakao-login/actions/workflows/ci-deploy.yml/badge.svg)](https://github.com/react-native-seoul/react-native-kakao-login/actions/workflows/ci-deploy.yml)
+[![VERSION](http://img.shields.io/npm/v/@react-native-seoul/kakao-login.svg?style=flat-square)](https://github.com/steadev/react-native-kakao-sdk)
+[![DOWNLOAD](http://img.shields.io/npm/dm/@react-native-seoul/kakao-login.svg?style=flat-square)](https://github.com/steadev/react-native-kakao-sdk)
+[![LICENSE](http://img.shields.io/npm/l/@react-native-seoul/kakao-login.svg?style=flat-square)](https://github.com/steadev/react-native-kakao-sdk)
+[![CI](https://github.com/react-native-seoul/react-native-kakao-login/actions/workflows/ci.yml/badge.svg)](https://github.com/steadev/react-native-kakao-sdk/actions/workflows/ci.yml)
+[![publish-package](https://github.com/react-native-seoul/react-native-kakao-login/actions/workflows/ci-deploy.yml/badge.svg)](https://github.com/steadev/react-native-kakao-sdk/actions/workflows/ci-deploy.yml)
 
-React Native 카카오 로그인 라이브러리 입니다. `@react-native-seoul/kakao-login` < 3.0 이하 버전을 쓰시는 분들은 [DEPRECATED README](https://github.com/react-native-seoul/react-native-kakao-login/blob/main/README_DEPRECATED.md)를 참고해주세요.
+React Native 카카오 로그인 라이브러리 입니다. `react-native-kakao-sdk` < 3.0 이하 버전을 쓰시는 분들은 [DEPRECATED README](https://github.com/steadev/react-native-kakao-sdk/blob/main/README_DEPRECATED.md)를 참고해주세요.
 
 세부 예제는 KakaoLoginExample 폴더 안의 예제 프로젝트를 확인해주세요.
 해당 라이브러리는 `flow`와 `typescript`를 지원합니다.
@@ -19,7 +19,7 @@ React Native 카카오 로그인 라이브러리 입니다. `@react-native-seoul
 
 ## Demo
 
-[카카오 로그인 Example Project](https://github.com/react-native-seoul/react-native-kakao-login/tree/main/KakaoLoginExample) 데모 화면
+[카카오 로그인 Example Project](https://github.com/steadev/react-native-kakao-sdk/tree/main/KakaoLoginExample) 데모 화면
 
 <img src="https://user-images.githubusercontent.com/27461460/111674724-a7989f00-885f-11eb-9e51-d146757ca836.gif" width="200">
 
@@ -40,12 +40,12 @@ React Native 카카오 로그인 라이브러리 입니다. `@react-native-seoul
 ## Installation
 
 ```
-yarn add @react-native-seoul/kakao-login
+yarn add react-native-kakao-sdk
 ```
 
 React Native 0.60.X이상부터는 `Auto linking`을 지원합니다. 따라서 설치는 매우 간편합니다.
 
-iOS의 경우 `yarn add @react-native-seoul/kakao-login` 이후 `npx pod-install` 명령어로 pod 라이브러리만 추가로 설치해주시면 됩니다.
+iOS의 경우 `yarn add react-native-kakao-sdk` 이후 `npx pod-install` 명령어로 pod 라이브러리만 추가로 설치해주시면 됩니다.
 
 ## Post Installation
 
@@ -94,7 +94,7 @@ iOS의 경우 `yarn add @react-native-seoul/kakao-login` 이후 `npx pod-install
 
    ```ruby
    # 없는 경우에는 package.json의 sdkVersions.ios.kakao를 따릅니다.
-   $KakaoSDKVersion=YOUR_KAKAO_SDK_VERSION 
+   $KakaoSDKVersion=YOUR_KAKAO_SDK_VERSION
    ```
 
 #### Android
@@ -179,6 +179,7 @@ iOS의 경우 `yarn add @react-native-seoul/kakao-login` 이후 `npx pod-install
    ```
 
 8. 여러 라이브러리에서 동일한 버전의 SDK를 써야 하는 경우 프로젝트의 `/android/build.gradle` 파일에, 아래의 형태로 버전을 강제 지정할 수 있습니다.
+
 ```groovy
     project.ext {
       set('react-native', [
@@ -191,7 +192,7 @@ iOS의 경우 `yarn add @react-native-seoul/kakao-login` 이후 `npx pod-install
             buildTools: "30.0.3",
             kotlin: "1.6.21"
           ],
-          
+
           // Overriding Library SDK Versions
           kakao: [
             // Override Kakao SDK Version

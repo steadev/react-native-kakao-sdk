@@ -1,14 +1,14 @@
-# @react-native-seoul/kakao-login
+# react-native-kakao-sdk
 
 <img src="image/main_banner.png" width="100%" height="auto" />
 <p align="left">
-  <a href="https://npmjs.org/package/@react-native-seoul/kakao-login">
+  <a href="https://npmjs.org/package/react-native-kakao-sdk">
     <img alt="npm version" src="http://img.shields.io/npm/v/@react-native-seoul/kakao-login.svg?style=flat-square">
   </a>
-  <a href="https://npmjs.org/package/@react-native-seoul/kakao-login">
+  <a href="https://npmjs.org/package/react-native-kakao-sdk">
     <img src="http://img.shields.io/npm/dm/@react-native-seoul/kakao-login.svg?style=flat-square">
   </a>
-  <a href="https://npmjs.org/package/@react-native-seoul/kakao-login">
+  <a href="https://npmjs.org/package/react-native-kakao-sdk">
     <img src="http://img.shields.io/npm/l/@react-native-seoul/kakao-login.svg?style=flat-square">
   </a>
 </p>
@@ -22,17 +22,9 @@ React Native 카카오 로그인 라이브러리 입니다.
 - RN >= 0.60 (최신 버전)
 
 ```shell
-$ npm install @react-native-seoul/kakao-login
+$ npm install react-native-kakao-sdk
 # OR
-$ yarn add @react-native-seoul/kakao-login
-```
-
-- RN < 0.60 (1.3.8 버전 이하로 설치 해주세요)
-
-```shell
-$ npm install react-native-kakao-logins@1.3.8
-# OR
-$ yarn add react-native-kakao-logins@1.3.8
+$ yarn add react-native-kakao-sdk
 ```
 
 ### Automatic installation
@@ -44,11 +36,6 @@ React Native 0.60.X이상부터는 `Auto linking`을 지원합니다
 
 만약 `iOS에서 'React/RCTBridgeModule.h' file not found` 이슈를 만난다면 해당 이슈를 참고해주세요 [#107](https://github.com/react-native-seoul/react-native-kakao-login/issues/107)
 
-
-##### RN < 0.60
-
-`$ react-native link react-native-kakao-logins` 또는 아래의 `Manual installation`를 참조하세요
-
 ### Manual installation (특별한 경우가 아니라면 필요하지 않습니다)
 
 ##### [RN >= 0.60] Manual installation을 원한다면 다음 설정을 먼저 해주세요
@@ -59,7 +46,7 @@ React Native 0.60.X이상부터는 `Auto linking`을 지원합니다
 // react-native.config.js
 module.exports = {
   dependencies: {
-    "@react-native-seoul/kakao-login": {
+    'react-native-kakao-sdk': {
       // Set null on platform that you want manual installation
       platforms: {
         ios: null,
@@ -89,7 +76,7 @@ module.exports = {
   - <b>앱생성 가이드 전</b> 까지 가이드대로 `SDK Framework`를 프로젝트에 import 해주세요
 
 2. Xcode를 열고, project main navigator, `Libraries` 폴더 우클릭 ➜ `Add Files to [your project's name]` 클릭
-3. 프로젝트의 `node_modules` 폴더 ➜ `@react-native-seoul/kakao-login` 그리고 `RNKakaoLogins.xcodeproj` 를 `Libraries`폴더에 추가합니다
+3. 프로젝트의 `node_modules` 폴더 ➜ `react-native-kakao-sdk` 그리고 `RNKakaoLogins.xcodeproj` 를 `Libraries`폴더에 추가합니다
 4. Xcode navigator에서 원하는 Target을 선택하고, `libRNKakaoLogins.a`파일을 `Build Phases` ➜ `Link Binary With Libraries`에 추가합니다
 5. `Post installation`를 참고하세요
 
@@ -131,7 +118,7 @@ module.exports = {
 2) `android/settings.gradle`에 다음을 추가합니다:
    ```diff
    +  include ':react-native-seoul-kakao-login'
-   +  project(':react-native-seoul-kakao-login').projectDir = new File(rootProject.projectDir,     '../node_modules/@react-native-seoul/kakao-login/android')
+   +  project(':react-native-seoul-kakao-login').projectDir = new File(rootProject.projectDir,     '../node_modules/react-native-kakao-sdk/android')
    ```
 3) `android/app/build.gradle`의 dependencies block 에 다음을 추가합니다:
    ```diff
@@ -240,14 +227,14 @@ ex: `Xo8WBi6jzSxKDVR4drqm84yr9iU=`
 
 #### Methods (callback is optional)
 
-| Func         |                                       Param                                     |     Return      | Description                |
-| :----------- | :-----------------------------------------------------------------------------: | :-------------: | :--------------------------|
-| login        |  `authTypes? Array<KAKAO_AUTH_TYPES>` `callback? (err: Error, result: Object)`  | Promise{Object} | 로그인                       |
-| getProfile   |                     `callback? (err: Error, result: Object)`                    | Promise{Object} | 프로필 불러오기                |
-| logout       |                     `callback? (err: Error, result: String)`                    | Promise{String} | 로그아웃                     |
-| unlink       |                     `callback? (err: Error, result: String)`                    | Promise{String} | 연결끊기                     |
-| updateScopes |                     `callback? (err: Error, result: String)`                    | Promise{Object} | 추가 권한 요청                |
-| getTokens    |                     `callback? (err: Error, result: String)`                    | Promise{Object} | 액세스 토큰, 리프레시 토큰 조회   |
+| Func         |                                     Param                                     |     Return      | Description                     |
+| :----------- | :---------------------------------------------------------------------------: | :-------------: | :------------------------------ |
+| login        | `authTypes? Array<KAKAO_AUTH_TYPES>` `callback? (err: Error, result: Object)` | Promise{Object} | 로그인                          |
+| getProfile   |                   `callback? (err: Error, result: Object)`                    | Promise{Object} | 프로필 불러오기                 |
+| logout       |                   `callback? (err: Error, result: String)`                    | Promise{String} | 로그아웃                        |
+| unlink       |                   `callback? (err: Error, result: String)`                    | Promise{String} | 연결끊기                        |
+| updateScopes |                   `callback? (err: Error, result: String)`                    | Promise{Object} | 추가 권한 요청                  |
+| getTokens    |                   `callback? (err: Error, result: String)`                    | Promise{Object} | 액세스 토큰, 리프레시 토큰 조회 |
 
 #### params in result when `login` and `updateScopes`
 
@@ -293,7 +280,7 @@ ex: `Xo8WBi6jzSxKDVR4drqm84yr9iU=`
 | `gender`            |  ✓  |    ✓    |        성별        |
 | `birthday`          |  ✓  |    ✓    |        생일        |
 | `birthyear`         |  ✓  |    ✓    |      출생연도      |
-| `age_range`         |  ✓  |    ✓    |        연령대      |
+| `age_range`         |  ✓  |    ✓    |       연령대       |
 
 `email` / `gender` / `birthday` / `birthyear` / `phone_number` / `display_id` / `is_email_verified` / `is_kakaotalk_user` / `has_signed_up` / `age_range` <strong>해당 값들은 사용자의 동의 혹은 제휴를 통해 권한이 부여된 특정 앱에서만 획득할 수 있습니다. 권한이 있다면 그에 맞는 값을 리턴하고, 권한이 없다면 null 값을 반환합니다.</strong>
 
@@ -367,7 +354,7 @@ KakaoLogins.login([KAKAO_AUTH_TYPES.Talk, KAKAO_AUTH_TYPES.Account]);
 
 ## Usage
 
-[@react-native-seoul/kakao-login/KakaoLoginExample/App.js](https://github.com/react-native-seoul/react-native-kakao-login/blob/main/KakaoLoginExample/App.js)
+[react-native-kakao-sdk/KakaoLoginExample/App.js](https://github.com/react-native-seoul/react-native-kakao-login/blob/main/KakaoLoginExample/App.js)
 
 ## How to run example project
 

@@ -1,7 +1,7 @@
 {
-  "name": "@react-native-seoul/kakao-login",
-  "version": "5.0.0",
-  "description": "React Native Module for Kakao Login",
+  "name": "react-native-kakao-sdk",
+  "version": "1.0.0",
+  "description": "React Native Module for Kakao SDK(forked from @react-native-seoul/kakao-login)",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "postinstall": "dooboolab-welcome postinstall",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/react-native-seoul/react-native-kakao-login"
+    "url": "git+https://github.com/steadev/react-native-kakao-sdk"
   },
   "publishConfig": {
     "access": "public"
@@ -23,9 +23,9 @@
     "react-native",
     "kakao",
     "login",
-    "kakao-login",
-    "react-native-seoul",
-    "dooboolab"
+    "kakao-sdk",
+    "dooboolab",
+    "react-native-kakao-sdk"
   ],
   "author": "dooboolab",
   "license": "MIT",
