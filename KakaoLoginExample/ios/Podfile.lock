@@ -1,5 +1,5 @@
 PODS:
-  - Alamofire (5.5.0)
+  - Alamofire (5.6.2)
   - boost-for-react-native (1.63.0)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
@@ -23,7 +23,7 @@ PODS:
     - OpenSSL-Universal (= 1.1.180)
   - Flipper-Glog (0.3.6)
   - Flipper-PeerTalk (0.0.4)
-  - Flipper-RSocket (1.3.0):
+  - Flipper-RSocket (1.3.1):
     - Flipper-Folly (~> 2.5)
   - FlipperKit (0.75.1):
     - FlipperKit/Core (= 0.75.1)
@@ -58,22 +58,6 @@ PODS:
     - FlipperKit/Core
     - FlipperKit/FlipperKitNetworkPlugin
   - glog (0.3.5)
-  - kakao-login (4.0.0):
-    - KakaoSDK (= 2.9.0)
-    - KakaoSDKAuth (= 2.9.0)
-    - KakaoSDKCommon (= 2.9.0)
-    - KakaoSDKTalk (= 2.9.0)
-    - KakaoSDKUser (= 2.9.0)
-    - React
-  - KakaoSDK (2.9.0):
-    - KakaoSDKAuth (= 2.9.0)
-    - KakaoSDKCommon (= 2.9.0)
-    - KakaoSDKLink (= 2.9.0)
-    - KakaoSDKNavi (= 2.9.0)
-    - KakaoSDKStory (= 2.9.0)
-    - KakaoSDKTalk (= 2.9.0)
-    - KakaoSDKTemplate (= 2.9.0)
-    - KakaoSDKUser (= 2.9.0)
   - KakaoSDKAuth (2.9.0):
     - KakaoSDKCommon (= 2.9.0)
   - KakaoSDKCommon (2.9.0):
@@ -86,10 +70,6 @@ PODS:
   - KakaoSDKLink (2.9.0):
     - KakaoSDKCommon (= 2.9.0)
     - KakaoSDKTemplate (= 2.9.0)
-  - KakaoSDKNavi (2.9.0):
-    - KakaoSDKCommon/Common (= 2.9.0)
-  - KakaoSDKStory (2.9.0):
-    - KakaoSDKUser (= 2.9.0)
   - KakaoSDKTalk (2.9.0):
     - KakaoSDKTemplate (= 2.9.0)
     - KakaoSDKUser (= 2.9.0)
@@ -292,6 +272,13 @@ PODS:
     - React-jsi (= 0.64.1)
     - React-perflogger (= 0.64.1)
   - React-jsinspector (0.64.1)
+  - react-native-kakao-sdk (1.0.0):
+    - KakaoSDKAuth (= 2.9.0)
+    - KakaoSDKCommon (= 2.9.0)
+    - KakaoSDKLink (= 2.9.0)
+    - KakaoSDKTalk (= 2.9.0)
+    - KakaoSDKUser (= 2.9.0)
+    - React
   - react-native-safe-area-context (3.2.0):
     - React-Core
   - React-perflogger (0.64.1)
@@ -425,7 +412,6 @@ DEPENDENCIES:
   - FlipperKit/FlipperKitUserDefaultsPlugin (~> 0.75.1)
   - FlipperKit/SKIOSNetworkPlugin (~> 0.75.1)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - "kakao-login (from `../node_modules/@react-native-seoul/kakao-login`)"
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -439,6 +425,7 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
+  - "react-native-kakao-sdk (from `../node_modules/@steadev/react-native-kakao-sdk`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -472,12 +459,9 @@ SPEC REPOS:
     - Flipper-PeerTalk
     - Flipper-RSocket
     - FlipperKit
-    - KakaoSDK
     - KakaoSDKAuth
     - KakaoSDKCommon
     - KakaoSDKLink
-    - KakaoSDKNavi
-    - KakaoSDKStory
     - KakaoSDKTalk
     - KakaoSDKTemplate
     - KakaoSDKUser
@@ -494,8 +478,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/React/FBReactNativeSpec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
-  kakao-login:
-    :path: "../node_modules/@react-native-seoul/kakao-login"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -518,6 +500,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-kakao-sdk:
+    :path: "../node_modules/@steadev/react-native-kakao-sdk"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-perflogger:
@@ -560,27 +544,23 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  Alamofire: 1c4fb5369c3fe93d2857c780d8bbe09f06f97e7c
+  Alamofire: d368e1ff8a298e6dde360e35a3e68e6c610e7204
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
-  FBReactNativeSpec: e87117337f49d2178fe109bb2453cea6bcef55fc
+  FBReactNativeSpec: 468306d599985cdeda2a9426353109f8a0f8beb2
   Flipper: d3da1aa199aad94455ae725e9f3aa43f3ec17021
   Flipper-DoubleConversion: 38631e41ef4f9b12861c67d17cb5518d06badc41
   Flipper-Folly: 755929a4f851b2fb2c347d533a23f191b008554c
   Flipper-Glog: 1dfd6abf1e922806c52ceb8701a3599a79a200a6
   Flipper-PeerTalk: 116d8f857dc6ef55c7a5a75ea3ceaafe878aadc9
-  Flipper-RSocket: 602921fee03edacf18f5d6f3d3594ba477f456e5
+  Flipper-RSocket: 127954abe8b162fcaf68d2134d34dc2bd7076154
   FlipperKit: 8a20b5c5fcf9436cac58551dc049867247f64b00
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
-  kakao-login: a94950a55bea6a1a182f6207a6e032f3cc5996f3
-  KakaoSDK: d5a5a38ebf4da97beeecf100ac3dc9a020e19648
   KakaoSDKAuth: 5d9eec3317320dc60015ba8d597b2ad32fc70b1a
   KakaoSDKCommon: aaed06bb779b92cd6f5c35e94160d4ecfaaac511
   KakaoSDKLink: 575d1119427a7b278eb49da656f8d648a0a94411
-  KakaoSDKNavi: 8b767610d59fc044f1f5df3f29c89688a446a1fc
-  KakaoSDKStory: a494a364a3539601289d01aadd117f165f39d7b2
   KakaoSDKTalk: b0ac197fd7fce4afc9af3f012c1abee7f053c910
   KakaoSDKTemplate: eaf03ad5e44d374cbfff85588552a5627cd0519c
   KakaoSDKUser: 37e92bfc1d36b339420952080a8d31c217a38a63
@@ -597,6 +577,7 @@ SPEC CHECKSUMS:
   React-jsi: 5de8204706bd872b78ea646aee5d2561ca1214b6
   React-jsiexecutor: 124e8f99992490d0d13e0649d950d3e1aae06fe9
   React-jsinspector: 500a59626037be5b3b3d89c5151bc3baa9abf1a9
+  react-native-kakao-sdk: 89620ab947cfa30f8279da24bc216436a1c0b234
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   React-perflogger: aad6d4b4a267936b3667260d1f649b6f6069a675
   React-RCTActionSheet: fc376be462c9c8d6ad82c0905442fd77f82a9d2a

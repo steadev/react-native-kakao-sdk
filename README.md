@@ -1,4 +1,4 @@
-# @react-native-seoul/kakao-login
+# @steadev/react-native-kakao-sdk
 
 <img src="image/main_banner.png" width="100%" height="auto" />
 
@@ -94,7 +94,7 @@ iOS의 경우 `yarn add @react-native-seoul/kakao-login` 이후 `npx pod-install
 
    ```ruby
    # 없는 경우에는 package.json의 sdkVersions.ios.kakao를 따릅니다.
-   $KakaoSDKVersion=YOUR_KAKAO_SDK_VERSION 
+   $KakaoSDKVersion=YOUR_KAKAO_SDK_VERSION
    ```
 
 #### Android
@@ -179,6 +179,7 @@ iOS의 경우 `yarn add @react-native-seoul/kakao-login` 이후 `npx pod-install
    ```
 
 8. 여러 라이브러리에서 동일한 버전의 SDK를 써야 하는 경우 프로젝트의 `/android/build.gradle` 파일에, 아래의 형태로 버전을 강제 지정할 수 있습니다.
+
 ```groovy
     project.ext {
       set('react-native', [
@@ -191,7 +192,7 @@ iOS의 경우 `yarn add @react-native-seoul/kakao-login` 이후 `npx pod-install
             buildTools: "30.0.3",
             kotlin: "1.6.21"
           ],
-          
+
           // Overriding Library SDK Versions
           kakao: [
             // Override Kakao SDK Version

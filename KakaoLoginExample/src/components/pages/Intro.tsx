@@ -1,19 +1,17 @@
 import {
-  KakaoOAuthToken,
-  KakaoProfile,
-  getProfile as getKakaoProfile,
-  login,
+  getProfile as getKakaoProfile, KakaoOAuthToken,
+  KakaoProfile, login,
   logout,
-  unlink,
-} from '@react-native-seoul/kakao-login';
-import React, {useState} from 'react';
+  unlink
+} from '@steadev/react-native-kakao-sdk';
+import React, { useState } from 'react';
 
-import Button from '../uis/Button';
-import {IC_MASK} from '../../utils/Icons';
-import ResultView from '../uis/IntroTemp';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import styled from 'styled-components/native';
-import {withScreen} from '../../utils/wrapper';
+import { IC_MASK } from '../../utils/Icons';
+import { withScreen } from '../../utils/wrapper';
+import Button from '../uis/Button';
+import ResultView from '../uis/IntroTemp';
 
 const Container = styled.View`
   flex: 1;
