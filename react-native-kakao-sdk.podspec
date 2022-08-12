@@ -37,6 +37,7 @@ Pod::Spec.new do |s|
   s.dependency 'KakaoSDKAuth',  kakao_sdk_version
   s.dependency 'KakaoSDKUser', kakao_sdk_version
   s.dependency 'KakaoSDKTalk', kakao_sdk_version
+  s.dependency 'KakaoSDKTemplate', kakao_sdk_version
   s.dependency 'KakaoSDKLink', kakao_sdk_version
 end
 

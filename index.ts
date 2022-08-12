@@ -1,6 +1,12 @@
-import {NativeModules} from 'react-native';
+import { NativeModules } from 'react-native';
 
-const {RNKakaoLogins} = NativeModules;
+const { RNKakaoLogins } = NativeModules;
+
+export enum KakaoOAuthTokenStatus {
+  LOGIN_NEEDED = 'LOGIN_NEEDED',
+  ERROR = 'ERROR',
+  SUCCEED = 'SUCCEED'
+}
 
 export type KakaoOAuthToken = {
   accessToken: string;
@@ -41,13 +47,33 @@ export type KakaoProfile = {
   profileNeedsAgreement?: boolean;
 };
 
+export type KakaoLinkParams = {
+  title: string;
+  description: string;
+  imageUrl: string;
+  imageLinkUrl: string;
+  buttonTitle: string;
+  imageWidth?: number;
+  imageHeight?: number;
+}
+
 export type KakaoProfileNoneAgreement = {
   id: string;
 };
 
-export const login = async (): Promise<KakaoOAuthToken> => {
+export const initializeKakao = async (): Promise<KakaoOAuthTokenStatus> => {
   try {
-    const result: KakaoOAuthToken = await RNKakaoLogins.login();
+    const result: KakaoOAuthTokenStatus = await RNKakaoLogins.initializeKakao();
+
+    return result;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export const login = async (serviceTerms?: string[]): Promise<KakaoOAuthToken> => {
+  try {
+    const result: KakaoOAuthToken = await RNKakaoLogins.login(serviceTerms);
 
     return result;
   } catch (err) {
@@ -106,3 +132,12 @@ export const getAccessToken = async (): Promise<KakaoAccessTokenInfo> => {
     throw err;
   }
 };
+
+export const sendLinkFeed = async (params: KakaoLinkParams): Promise<void> => {
+  try {
+    await RNKakaoLogins.sendLinkFeed(params);
+
+  } catch (err) {
+    throw err;
+  }
+}
