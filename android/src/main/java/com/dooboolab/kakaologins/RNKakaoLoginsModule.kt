@@ -20,7 +20,7 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
     }
 
     @ReactMethod
-    private fun login(promise: Promise) {
+    private fun login(serviceTerms: ReadableArray?, promise: Promise) {
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(reactContext)) {
             reactContext.currentActivity?.let {
                 UserApiClient.instance.loginWithKakaoTalk(it) { token, error: Throwable? ->
