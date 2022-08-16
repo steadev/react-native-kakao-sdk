@@ -77,9 +77,9 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:${ReactNative.ext.getVersion("android", "kotlin")}"
 
   // Kakao
-  implementation "com.kakao.sdk:v2-user:${ReactNative.ext.getVersion("kakao", "sdk")}" // 카카오 로그인
-  implementation "com.kakao.sdk:v2-talk:${ReactNative.ext.getVersion("kakao", "sdk")}" // 친구, 메시지(카카오톡)
-  implementation "com.kakao.sdk:v2-story:${ReactNative.ext.getVersion("kakao", "sdk")}" // 카카오 스토리
+  implementation "com.kakao.sdk:v2-user:2.11.0" // 카카오 로그인
+  implementation "com.kakao.sdk:v2-talk:2.11.0" // 친구, 메시지(카카오톡)
+  implementation "com.kakao.sdk:v2-share:2.11.0" // 메시지(카카오톡 공유)
 }
 
 ReactNative.shared.applyPackageVersion()

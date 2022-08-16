@@ -81,15 +81,15 @@ export const login = async (serviceTerms?: string[]): Promise<KakaoOAuthToken> =
   }
 };
 
-export const loginWithKakaoAccount = async (): Promise<KakaoOAuthToken> => {
+export const loginWithNewScopes = async (scopes: [string]): Promise<KakaoOAuthToken> => {
   try {
-    const result: KakaoOAuthToken = await RNKakaoLogins.loginWithKakaoAccount();
+    const result: KakaoOAuthToken = await RNKakaoLogins.loginWithNewScopes(scopes);
 
     return result;
   } catch (err) {
     throw err;
   }
-};
+}
 
 export const logout = async (): Promise<string> => {
   try {

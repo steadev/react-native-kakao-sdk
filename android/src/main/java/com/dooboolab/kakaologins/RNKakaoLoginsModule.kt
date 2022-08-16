@@ -1,13 +1,31 @@
 package com.dooboolab.kakaologins
 
+import android.content.ActivityNotFoundException
 import com.facebook.react.bridge.*
 import com.kakao.sdk.common.KakaoSdk.init
-import com.kakao.sdk.common.model.AuthError
 import com.kakao.sdk.user.UserApiClient
 import com.kakao.sdk.user.model.User
 import com.kakao.sdk.auth.TokenManagerProvider
+import com.kakao.sdk.auth.AuthApiClient
+import com.kakao.sdk.common.model.KakaoSdkError
 import java.text.SimpleDateFormat
 import java.util.*
+import com.google.gson.Gson
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.util.KakaoCustomTabsClient
+import com.kakao.sdk.share.ShareClient
+import com.kakao.sdk.share.WebSharerClient
+import com.kakao.sdk.share.model.SharingResult
+import com.kakao.sdk.template.model.Button
+import com.kakao.sdk.template.model.Content
+import com.kakao.sdk.template.model.FeedTemplate
+import com.kakao.sdk.template.model.Link
+
+enum class TokenStatus {
+    LOGIN_NEEDED,
+    ERROR,
+    SUCCEED
+}
 
 class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     private fun dateFormat(date: Date?): String {
@@ -20,103 +38,103 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
     }
 
     @ReactMethod
-    private fun login(serviceTerms: ReadableArray?, promise: Promise) {
-        if (UserApiClient.instance.isKakaoTalkLoginAvailable(reactContext)) {
-            reactContext.currentActivity?.let {
-                UserApiClient.instance.loginWithKakaoTalk(it) { token, error: Throwable? ->
+     fun initializeKakao(promise: Promise) {
+         tokenAvailability() { status: TokenStatus ->
+             val map = Arguments.createMap()
+             map.putString("status", status.toString())
+             promise.resolve(map)
+         }
+     }
+
+    @ReactMethod
+    fun login(serviceTerms: ReadableArray?, promise: Promise) {
+         var serviceTermsParam = if (serviceTerms === null || serviceTerms.size() === 0) null else serviceTerms;
+         val serviceTermList = ArrayList<String>()
+         if (serviceTermsParam != null) {
+             for (param in serviceTermsParam.toArrayList()) {
+                 serviceTermList.add(param.toString())
+             }
+         }
+
+         if (UserApiClient.instance.isKakaoTalkLoginAvailable(reactContext)) {
+             reactContext.currentActivity?.let {
+                 if (serviceTermsParam != null) {
+                     val serviceTermList = ArrayList<String>()
+                     for (param in serviceTermsParam.toArrayList()) {
+                         serviceTermList.add(param.toString())
+                     }
+                     UserApiClient.instance.loginWithKakaoTalk(
+                         it,
+                         serviceTerms = serviceTermList.toList()
+                     ) { oAuthToken: OAuthToken?, error: Throwable? ->
+                         handleKakaoLoginResponse(promise, oAuthToken, error)
+                         return@loginWithKakaoTalk
+                     }
+                 } else {
+                     UserApiClient.instance.loginWithKakaoTalk(
+                         it
+                     ) { oAuthToken: OAuthToken?, error: Throwable? ->
+                         handleKakaoLoginResponse(promise, oAuthToken, error)
+                         return@loginWithKakaoTalk
+                     }
+                 }
+             }
+
+         } else {
+             if (serviceTermsParam != null) {
+                 UserApiClient.instance.loginWithKakaoAccount(
+                     reactContext,
+                     serviceTerms = serviceTermList.toList()
+                 ) { oAuthToken: OAuthToken?, error: Throwable? ->
+                     handleKakaoLoginResponse(promise, oAuthToken, error)
+                     return@loginWithKakaoAccount
+                 }
+             } else {
+                 UserApiClient.instance.loginWithKakaoAccount(
+                     reactContext
+                 ) { oAuthToken: OAuthToken?, error: Throwable? ->
+                     handleKakaoLoginResponse(promise, oAuthToken, error)
+                     return@loginWithKakaoAccount
+                 }
+             }
+         }
+    }
+
+    fun loginWithNewScopes(scopes: ReadableArray, promise: Promise) {
+        var scopesParam = if (scopes === null || scopes.size() === 0) null else scopes;
+        val scopeList = ArrayList<String>()
+        if (scopesParam != null) {
+            for (param in scopesParam.toArrayList()) {
+                scopeList.add(param.toString())
+            }
+        }
+
+        if (scopeList.size > 0) {
+            UserApiClient.instance.loginWithNewScopes(reactContext, scopeList) { token, error ->
+                reactContext.currentActivity?.let {
                     if (error != null) {
-                        if (error is AuthError && error.statusCode == 302) {
-                            this.loginWithKakaoAccount(promise)
-                            return@loginWithKakaoTalk
+                        if (UserApiClient.instance.isKakaoTalkLoginAvailable(it)) {
+                            UserApiClient.instance
+                                .loginWithKakaoTalk(
+                                    it
+                                ) { oAuthToken: OAuthToken?, error: Throwable? ->
+                                    handleKakaoLoginResponse(promise, oAuthToken, error)
+                                }
+                        } else {
+                            UserApiClient.instance
+                                .loginWithKakaoAccount(
+                                    it
+                                ) { oAuthToken: OAuthToken?, error: Throwable? ->
+                                    handleKakaoLoginResponse(promise, oAuthToken, error)
+                                }
                         }
-                        promise.reject("RNKakaoLogins", error.message, error)
-                        return@loginWithKakaoTalk
+                    } else {
+                        promise.resolve("succeed")
                     }
-
-                    if (token != null) {
-                        val (accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, idToken, scopes) = token
-                        val map = Arguments.createMap()
-                        map.putString("accessToken", accessToken)
-                        map.putString("refreshToken", refreshToken)
-                        map.putString("idToken", idToken)
-                        map.putString("accessTokenExpiresAt", dateFormat(accessTokenExpiresAt))
-                        map.putString("refreshTokenExpiresAt", dateFormat(refreshTokenExpiresAt))
-                        val scopeArray = Arguments.createArray()
-                        if (scopes != null) {
-                            for (scope in scopes) {
-                                scopeArray.pushString(scope)
-                            }
-                        }
-                        map.putArray("scopes", scopeArray)
-                        promise.resolve(map)
-                        return@loginWithKakaoTalk
-                    }
-
-                    promise.reject("RNKakaoLogins", "Token is null")
                 }
             }
         } else {
-            UserApiClient.instance.loginWithKakaoAccount(reactContext) { token, error: Throwable? ->
-                if (error != null) {
-                    promise.reject("RNKakaoLogins", error.message, error)
-                    return@loginWithKakaoAccount
-                }
-
-                if (token != null) {
-                    val (accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, idToken, scopes) = token
-                    val map = Arguments.createMap()
-                    map.putString("accessToken", accessToken)
-                    map.putString("refreshToken", refreshToken)
-                    map.putString("idToken", idToken)
-                    map.putString("accessTokenExpiresAt", dateFormat(accessTokenExpiresAt))
-                    map.putString("refreshTokenExpiresAt", dateFormat(refreshTokenExpiresAt))
-                    val scopeArray = Arguments.createArray()
-                    if (scopes != null) {
-                        for (scope in scopes) {
-                            scopeArray.pushString(scope)
-                        }
-                    }
-                    map.putArray("scopes", scopeArray)
-                    promise.resolve(map)
-                    return@loginWithKakaoAccount
-                }
-
-                promise.reject("RNKakaoLogins", "Token is null")
-            }
-        }
-    }
-
-    @ReactMethod
-    private fun loginWithKakaoAccount(promise: Promise) {
-        UserApiClient.instance.loginWithKakaoAccount(reactContext) { token, error: Throwable? ->
-            if (error != null) {
-                promise.reject("RNKakaoLogins", error.message, error)
-                return@loginWithKakaoAccount
-            }
-
-            if (token == null) {
-                promise.reject("RNKakaoLogins", "Token is null")
-                return@loginWithKakaoAccount
-            }
-
-            if (token != null) {
-                val (accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, idToken, scopes) = token
-                val map = Arguments.createMap()
-                map.putString("accessToken", accessToken)
-                map.putString("refreshToken", refreshToken)
-                map.putString("idToken", idToken)
-                map.putString("accessTokenExpiresAt", dateFormat(accessTokenExpiresAt))
-                map.putString("refreshTokenExpiresAt", dateFormat(refreshTokenExpiresAt))
-                val scopeArray = Arguments.createArray()
-                if (scopes != null) {
-                    for (scope in scopes) {
-                        scopeArray.pushString(scope)
-                    }
-                }
-                map.putArray("scopes", scopeArray)
-                promise.resolve(map)
-                return@loginWithKakaoAccount
-            }
+            promise.resolve("succeed")
         }
     }
 
@@ -167,10 +185,6 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
          }
     }
 
-    private fun convertValue(`val`: Boolean?): Boolean {
-        return `val` ?: false
-    }
-
     @ReactMethod
     private fun getProfile(promise: Promise) {
         UserApiClient.instance.me { user: User?, error: Throwable? ->
@@ -216,6 +230,68 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
         }
     }
 
+    @ReactMethod
+    fun sendLinkFeed(params: Map<String, String>, promise: Promise) {
+        val imageLinkUrl = params["imageLinkUrl"]
+        val imageUrl: String = if (params["imageUrl"] === null) "" else params["imageUrl"]!!
+        val title: String = if (params["title"] === null) "" else params["title"]!!
+        val description = params["description"]
+        val buttonTitle: String =
+            if (params["buttonTitle"] === null) "" else params["buttonTitle"]!!
+        val imageWidth: Int? = params["imageWidth"]?.toInt()
+        val imageHeight: Int? = params["imageHeight"]?.toInt()
+
+        val link = Link(imageLinkUrl, imageLinkUrl, null, null)
+        val content = Content(title, imageUrl, link, description, imageWidth, imageHeight)
+        val buttons = ArrayList<Button>()
+        buttons.add(Button(buttonTitle, link))
+        val feed = FeedTemplate(content, null, null, buttons)
+        if (ShareClient.instance.isKakaoTalkSharingAvailable(reactContext)) {
+            reactContext.currentActivity?.let {
+                ShareClient.instance
+                    .shareDefault(
+                        it,
+                        feed
+                    ) { shareResult: SharingResult?, error: Throwable? ->
+                        if (error != null) {
+                            promise.reject("RNKakaoLogins", "kakao link failed: $error")
+                        } else if (shareResult != null) {
+                            it.startActivity(shareResult.intent)
+                        }
+                        promise.resolve("succeed")
+                    }
+            }
+        } else {
+            reactContext.currentActivity?.let {
+                // 카카오톡 미설치: 웹 공유 사용 권장
+                // 웹 공유 예시 코드
+                val sharerUrl = WebSharerClient.instance.makeDefaultUrl(feed)
+                var shareResult = true
+                // CustomTabs으로 웹 브라우저 열기
+
+                // 1. CustomTabsServiceConnection 지원 브라우저 열기
+                // ex) Chrome, 삼성 인터넷, FireFox, 웨일 등
+                try {
+                    KakaoCustomTabsClient.openWithDefault(it, sharerUrl)
+                    promise.resolve("succeed")
+                } catch(e: UnsupportedOperationException) {
+                    // CustomTabsServiceConnection 지원 브라우저가 없을 때 예외처리
+                    shareResult = false
+                }
+
+                // 2. CustomTabsServiceConnection 미지원 브라우저 열기
+                // ex) 다음, 네이버 등
+                try {
+                    KakaoCustomTabsClient.open(it, sharerUrl)
+                    promise.resolve("succeed")
+                } catch (e: ActivityNotFoundException) {
+                    // 디바이스에 설치된 인터넷 브라우저가 없을 때 예외처리
+                    shareResult = false
+                }
+            }
+        }
+    }
+
     companion object {
         private const val TAG = "RNKakaoLoginModule"
     }
@@ -225,226 +301,53 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
                 reactContext.resources.getIdentifier("kakao_app_key", "string", reactContext.packageName))
         init(reactContext, kakaoAppKey)
     }
+
+    private fun tokenAvailability(callback: (TokenStatus) -> Unit) {
+        if (AuthApiClient.instance.hasToken()) {
+            UserApiClient.instance.accessTokenInfo { _, error ->
+                if (error != null) {
+                    if (error is KakaoSdkError && error.isInvalidTokenError()) {
+                        callback(TokenStatus.LOGIN_NEEDED)
+                    }
+                    else {
+                        callback(TokenStatus.ERROR)
+                    }
+                }
+                else {
+                    callback(TokenStatus.SUCCEED)
+                }
+            }
+        }
+        else {
+            callback(TokenStatus.LOGIN_NEEDED)
+        }
+    }
+
+    private fun handleKakaoLoginResponse(promise: Promise, oAuthToken: OAuthToken?, error: Throwable?) {
+        if (error != null) {
+            promise.reject("RNKakaoLogins", error.toString())
+        } else if (oAuthToken != null) {
+            val (accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, idToken, scopes) = oAuthToken
+            val map = Arguments.createMap()
+            map.putString("accessToken", accessToken)
+            map.putString("refreshToken", refreshToken)
+            map.putString("idToken", idToken)
+            map.putString("accessTokenExpiresAt", dateFormat(accessTokenExpiresAt))
+            map.putString("refreshTokenExpiresAt", dateFormat(refreshTokenExpiresAt))
+            val scopeArray = Arguments.createArray()
+            if (scopes != null) {
+                for (scope in scopes) {
+                    scopeArray.pushString(scope)
+                }
+            }
+            map.putArray("scopes", scopeArray)
+            promise.resolve(map)
+        } else {
+            promise.reject("RNKakaoLogins", "no_data")
+        }
+    }
+
+    private fun convertValue(`val`: Boolean?): Boolean {
+        return `val` ?: false
+    }
 }
-
-// import android.util.Log
-// import androidx.appcompat.app.AppCompatActivity
-// import com.getcapacitor.JSArray
-// import com.getcapacitor.JSObject
-// import com.getcapacitor.PluginCall
-// import com.kakao.sdk.user.UserApiClient
-// import com.kakao.sdk.auth.model.OAuthToken
-// import com.kakao.sdk.template.model.FeedTemplate
-// import com.kakao.sdk.link.LinkClient
-// import com.kakao.sdk.link.model.LinkResult
-// import com.kakao.sdk.template.model.Button
-// import com.kakao.sdk.template.model.Content
-// import com.kakao.sdk.template.model.Link
-// import java.util.ArrayList
-// import com.google.gson.Gson
-// import com.kakao.sdk.auth.AuthApiClient
-// import com.kakao.sdk.common.model.KakaoSdkError
-// import com.kakao.sdk.talk.TalkApiClient
-// import com.kakao.sdk.talk.model.Order
-// import org.json.JSONArray
-
-// val gson = Gson()
-
-// enum class TokenStatus {
-//     LOGIN_NEEDED,
-//     ERROR,
-//     SUCCEED
-// }
-
-
-// class CapacitorKakao(var activity: AppCompatActivity) {
-//     fun initializeKakao(call: PluginCall) {
-//         tokenAvailability() { status: TokenStatus ->
-//             val ret = JSObject()
-//             ret.put("status", status.toString())
-//             call.resolve(ret)
-//         }
-//     }
-
-//     fun kakaoLogin(call: PluginCall) {
-//         var serviceTermsParam = call.getArray("serviceTerms");
-//         serviceTermsParam = if (serviceTermsParam === null || serviceTermsParam.length() === 0) null else serviceTermsParam;
-
-//         if (UserApiClient.instance.isKakaoTalkLoginAvailable(activity)) {
-//             if (serviceTermsParam != null) {
-//                 UserApiClient.instance.loginWithKakaoTalk(
-//                     activity,
-//                     serviceTerms = serviceTermsParam.toList<String>()
-//                 ) { oAuthToken: OAuthToken?, error: Throwable? ->
-//                     handleKakaoLoginResponse(call, oAuthToken, error)
-//                 }    
-//             } else {
-//                 UserApiClient.instance.loginWithKakaoTalk(
-//                     activity
-//                 ) { oAuthToken: OAuthToken?, error: Throwable? ->
-//                     handleKakaoLoginResponse(call, oAuthToken, error)
-//                 }
-//             }
-//         } else {
-//             if (serviceTermsParam != null) {
-//                 UserApiClient.instance.loginWithKakaoAccount(
-//                     activity,
-//                     serviceTerms = serviceTermsParam.toList<String>()
-//                 ) { oAuthToken: OAuthToken?, error: Throwable? ->
-//                     handleKakaoLoginResponse(call, oAuthToken, error)
-//                 }
-//             } else {
-//                 UserApiClient.instance.loginWithKakaoAccount(
-//                     activity
-//                 ) { oAuthToken: OAuthToken?, error: Throwable? ->
-//                     handleKakaoLoginResponse(call, oAuthToken, error)
-//                 }
-//             }
-//         }
-//     }
-
-//     private fun handleKakaoLoginResponse(call: PluginCall, oAuthToken: OAuthToken?, error: Throwable?) {
-//         if (error != null) {
-//             Log.e(TAG, "login fail : ", error)
-//             call.reject(error.toString())
-//         } else if (oAuthToken != null) {
-//             Log.i(TAG, "login success : " + oAuthToken.accessToken)
-//             val ret = JSObject()
-//             ret.put("accessToken", oAuthToken.accessToken)
-//             ret.put("refreshToken", oAuthToken.refreshToken)
-//             call.resolve(ret)
-//         } else {
-//             call.reject("no_data")
-//         }
-//     }
-
-//     fun sendLinkFeed(call: PluginCall) {
-//         val imageLinkUrl = call.getString("imageLinkUrl")
-//         val imageUrl: String = if (call.getString("imageUrl") === null) "" else call.getString("imageUrl")!!
-//         val title: String = if (call.getString("title") === null) "" else call.getString("title")!!
-//         val description = call.getString("description")
-//         val buttonTitle: String = if (call.getString("buttonTitle") === null) "" else call.getString("buttonTitle")!!
-//         val imageWidth: Int? = call.getInt("imageWidth")
-//         val imageHeight: Int? = call.getInt("imageHeight")
-        
-//         val link = Link(imageLinkUrl, imageLinkUrl, null, null)
-//         val content = Content(title, imageUrl, link, description, imageWidth, imageHeight)
-//         val buttons = ArrayList<Button>()
-//         buttons.add(Button(buttonTitle, link))
-//         val feed = FeedTemplate(content, null, buttons)
-//         LinkClient.instance
-//             .defaultTemplate(
-//                     activity,
-//                     feed
-//             ) { linkResult: LinkResult?, error: Throwable? ->
-//                 if (error != null) {
-//                     call.reject("kakao link failed: " + error.toString())
-//                 } else if (linkResult != null) {
-//                     activity.startActivity(linkResult.intent)
-//                 }
-//                 call.resolve()
-//             }
-//     }
-    
-//     fun loginWithNewScopes(call: PluginCall) {
-//         var scopes = mutableListOf<String>()
-//         val tobeAgreedScopes = call.getArray("scopes").toList<String>()
-//         for (scope in tobeAgreedScopes) {
-//             scopes.add(scope)
-//         }
-//         if (scopes.count() > 0) {
-//             Log.d(TAG, "사용자에게 추가 동의를 받아야 합니다.")
-
-//             UserApiClient.instance.loginWithNewScopes(activity, scopes) { token, error ->
-//                 if (error != null) {
-//                     Log.e(TAG, "사용자 추가 동의 실패", error)
-//                     // call.reject("scopes agree failed")
-//                     if (UserApiClient.instance.isKakaoTalkLoginAvailable(activity)) {
-//                         UserApiClient.instance
-//                             .loginWithKakaoTalk(
-//                                     activity
-//                             ) { oAuthToken: OAuthToken?, error: Throwable? ->
-//                                 if (error != null) {
-//                                     Log.e(TAG, "login fail : ", error)
-//                                     call.reject(error.toString())
-//                                 } else if (oAuthToken != null) {
-//                                     Log.i(TAG, "login success : " + oAuthToken.accessToken)
-//                                     loginWithNewScopes(call)
-//                                 } else {
-//                                     call.reject("no_data")
-//                                 }
-//                             }
-//                     } else {
-//                         UserApiClient.instance
-//                             .loginWithKakaoAccount(
-//                                     activity
-//                             ) { oAuthToken: OAuthToken?, error: Throwable? ->
-//                                 if (error != null) {
-//                                     Log.e(TAG, "login fail : ", error)
-//                                     call.reject(error.toString())
-//                                 } else if (oAuthToken != null) {
-//                                     Log.i(TAG, "login success : " + oAuthToken.accessToken)
-//                                     val ret = JSObject()
-//                                     ret.put("accessToken", oAuthToken.accessToken)
-//                                     ret.put("refreshToken", oAuthToken.refreshToken)
-//                                     call.resolve(ret)
-//                                 } else {
-//                                     call.reject("no_data")
-//                                 }
-//                             }
-//                     }
-//                 } else {
-//                     Log.d(TAG, "allowed scopes: ${token!!.scopes}")
-//                     call.resolve()
-//                 }
-//             }
-//         } else {
-//             call.resolve()
-//         }
-//     }
-
-//     fun getUserScopes(call: PluginCall) {
-//         UserApiClient.instance.scopes { scopeInfo, error->
-//             if (error != null) {
-//                 Log.e(TAG, "동의 정보 확인 실패", error)
-//                 call.reject("동의 정보 확인 실패" + error.toString())
-//             }else if (scopeInfo != null) {
-//                 Log.i(TAG, "동의 정보 확인 성공\n 현재 가지고 있는 동의 항목 $scopeInfo")
-//                 val scopeList = JSArray()
-//                 if (scopeInfo.scopes != null) {
-//                     for (scope in scopeInfo.scopes!!) {
-//                         scopeList.put(scope)
-//                     }
-//                 }
-//                 val ret = JSObject()
-//                 ret.put("value", scopeList)
-//                 call.resolve(ret);
-//             }
-//         }
-//     }
-
-//     private fun tokenAvailability(callback: (TokenStatus) -> Unit) {
-//         if (AuthApiClient.instance.hasToken()) {
-//             UserApiClient.instance.accessTokenInfo { _, error ->
-//                 if (error != null) {
-//                     if (error is KakaoSdkError && error.isInvalidTokenError() == true) {
-//                         callback(TokenStatus.LOGIN_NEEDED)
-//                     }
-//                     else {
-//                         callback(TokenStatus.ERROR)
-//                     }
-//                 }
-//                 else {
-//                     callback(TokenStatus.SUCCEED)
-//                 }
-//             }
-//         }
-//         else {
-//             callback(TokenStatus.LOGIN_NEEDED)
-//         }
-//     }
-
-//     companion object {
-//         private const val TAG = "CapacitorKakao"
-//     }
-// }
