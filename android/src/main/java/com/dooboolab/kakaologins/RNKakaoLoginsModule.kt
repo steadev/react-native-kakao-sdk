@@ -114,28 +114,14 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
             UserApiClient.instance.loginWithNewScopes(reactContext, scopeList) { token, error ->
                 reactContext.currentActivity?.let {
                     if (error != null) {
-                        if (UserApiClient.instance.isKakaoTalkLoginAvailable(it)) {
-                            UserApiClient.instance
-                                .loginWithKakaoTalk(
-                                    it
-                                ) { oAuthToken: OAuthToken?, error: Throwable? ->
-                                    handleKakaoLoginResponse(promise, oAuthToken, error)
-                                }
-                        } else {
-                            UserApiClient.instance
-                                .loginWithKakaoAccount(
-                                    it
-                                ) { oAuthToken: OAuthToken?, error: Throwable? ->
-                                    handleKakaoLoginResponse(promise, oAuthToken, error)
-                                }
-                        }
+                        promise.reject("RNKakaoLogins", error.message, error)
                     } else {
                         promise.resolve("succeed")
                     }
                 }
             }
         } else {
-            promise.resolve("succeed")
+            promise.resolve("empty scopes")
         }
     }
 
