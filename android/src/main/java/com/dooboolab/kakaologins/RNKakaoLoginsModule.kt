@@ -100,6 +100,7 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
          }
     }
 
+    @ReactMethod
     fun loginWithNewScopes(scopes: ReadableArray, promise: Promise) {
         var scopesParam = if (scopes === null || scopes.size() === 0) null else scopes;
         val scopeList = ArrayList<String>()
