@@ -125,6 +125,28 @@ class RNKakaoLogins: NSObject {
         }
     }
     
+    @objc(loginWithNewScopes:resolver:rejecter:)
+    func loginWithNewScopes(_ scopes: NSArray, resolver resolve: @escaping RCTPromiseResolveBlock,
+                                         rejecter reject: @escaping RCTPromiseRejectBlock) ->  Void {
+        DispatchQueue.main.async {
+            if scopes.count == 0  {
+                resolve("empty scopes")
+                return
+            }
+            
+            var scopeParam = [String]()
+            for scope in scopes {
+                scopeParam.append(scope as! String)
+            }
+
+            print(scopeParam)
+            //필요한 scope으로 토큰갱신을 한다.
+            UserApi.shared.loginWithKakaoAccount(scopes: scopeParam) { (oauthToken, error) in
+                self.handleKakaoLoginResponse(resolve: resolve, reject: reject, oauthToken: oauthToken, error: error)
+            }
+        }
+    }
+    
     private func handleKakaoLoginResponse(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock, oauthToken: OAuthToken?, error: Error?) -> Void {
         if let error = error {
             reject("RNKakaoLogins", error.localizedDescription, nil)
@@ -184,8 +206,8 @@ class RNKakaoLogins: NSObject {
                 }
                 else {
                     resolve([
-                        "accessToken": TokenManager.manager.getToken()?.accessToken,
-                        "expiresIn": accessTokenInfo?.expiresIn,
+                        "accessToken": TokenManager.manager.getToken()?.accessToken as Any,
+                        "expiresIn": accessTokenInfo?.expiresIn as Any,
                     ])
                 }
             }
