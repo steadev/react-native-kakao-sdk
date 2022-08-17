@@ -8,7 +8,7 @@ export enum KakaoOAuthTokenStatus {
   SUCCEED = 'SUCCEED'
 }
 
-type KakaoOAuthTokenStatusInfo = {
+export type KakaoOAuthTokenStatusInfo = {
   status: KakaoOAuthTokenStatus;
 }
 
@@ -65,11 +65,11 @@ export type KakaoProfileNoneAgreement = {
   id: string;
 };
 
-export const initializeKakao = async (): Promise<KakaoOAuthTokenStatus> => {
+export const initializeKakao = async (): Promise<KakaoOAuthTokenStatusInfo> => {
   try {
     const result: KakaoOAuthTokenStatusInfo = await RNKakaoLogins.initializeKakao();
 
-    return result.status;
+    return result;
   } catch (err) {
     throw err;
   }

@@ -18,7 +18,7 @@ iOS Kakao SDK version: 2.9.0<br />
 
 <br />
 
-### initializeKakao(): Promise<void>
+### initializeKakao(): Promise<KakaoOAuthTokenStatusInfo>
 
 ---
 
