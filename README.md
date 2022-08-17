@@ -47,6 +47,8 @@ Kakao sync를 지원합니다.<br />
 이미 kakao sync로 가입한 유저는 serviceTerm이 수정되거나 추가되어도 그냥 로그인 되버립니다.<br />
 이 경우 serviceTerms를 파라미터로 넘기면 해당 terms에 대해 동의 받을 수 있습니다.<br />
 
+<br />
+
 ### loginWithNewScopes(scopes: [string]): Promise<KakaoOAuthToken>
 
 ---
