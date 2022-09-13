@@ -9,6 +9,25 @@ Supports `Kakao Sync`, `Kakao link`, `loginWithNewScopes`(추가항목 동의받
 Android Kakao SDK version: 2.11.0<br />
 iOS Kakao SDK version: 2.9.0<br />
 
+## Archive Error
+
+`Undefined symbol: _OBJC_CLASS_$_RNKakaoLogins`<br />
+When this error occurs, paste below codes to root project's Podfile <br />
+
+```
+pre_install do |installer|
+  Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+
+  installer.pod_targets.each do |pod|
+    if pod.name.start_with?('react-native-kakao-sdk')
+      def pod.build_type;
+        Pod::BuildType.static_library # get kakao_login static approach instead of dynamic one because of use_frameworks!
+      end
+    end
+  end
+end
+```
+
 ## Added / Edited Functions
 
 - `initializeKakao()`
