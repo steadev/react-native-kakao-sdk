@@ -14,6 +14,7 @@ import KakaoSDKShare
 import KakaoSDKTemplate
 import KakaoSDKAuth
 import KakaoSDKTalk
+import SafariServices
 
 extension Encodable {
     
@@ -33,6 +34,8 @@ enum TokenStatus: String {
 @objc(RNKakaoLogins)
 class RNKakaoLogins: NSObject {
 
+//    var safariViewController : SFSafariViewController? // to keep instance
+    
     public override init() {
         let appKey: String? = Bundle.main.object(forInfoDictionaryKey: "KAKAO_APP_KEY") as? String
         KakaoSDK.initSDK(appKey: appKey!)
@@ -254,7 +257,7 @@ class RNKakaoLogins: NSObject {
     }
     
     @objc(sendLinkFeed:resolver:rejecter:)
-    func sendLinkFeed(_ data: [String: Any], resolver resolve: @escaping RCTPromiseResolveBlock,
+    func sendLinkFeed(_ data: NSDictionary, resolver resolve: @escaping RCTPromiseResolveBlock,
     rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
         DispatchQueue.main.async {
             let title = data["title"] ?? ""
@@ -284,19 +287,35 @@ class RNKakaoLogins: NSObject {
 
             //생성한 메시지 템플릿 객체를 jsonObject로 변환
                 if let templateJsonObject = SdkUtils.toJsonObject(feedTemplateJsonData) {
-                    ShareApi.shared.shareDefault(templateObject:templateJsonObject) {(linkResult, error) in
-                        if let error = error {
-                            print(error)
-                            reject("RNKakaoLogins", error.localizedDescription, nil)
-                        }
-                        else {
+                    if ShareApi.isKakaoTalkSharingAvailable() {
+                        ShareApi.shared.shareDefault(templateObject:templateJsonObject) {(linkResult, error) in
+                            if let error = error {
+                                print(error)
+                                reject("RNKakaoLogins", error.localizedDescription, nil)
+                            }
+                            else {
 
-                            //do something
-                            guard let linkResult = linkResult else { return }
-                            UIApplication.shared.open(linkResult.url, options: [:], completionHandler: nil)
-                            
-                            resolve("succeed")
+                                //do something
+                                guard let linkResult = linkResult else { return }
+                                UIApplication.shared.open(linkResult.url, options: [:], completionHandler: nil)
+                                
+                                resolve("succeed")
+                            }
                         }
+                    } else {
+                        reject("isKakaoTalkSharingAvailable", "false", nil)
+                        // 카카오톡 미설치: 웹 공유 사용 권장
+                        // Custom WebView 또는 디폴트 브라우져 사용 가능
+                        // 웹 공유 예시 코드
+//                        if let url = ShareApi.shared.makeDefaultUrl(templateObject: templateJsonObject) {
+//
+//                            self.safariViewController = SFSafariViewController(url: url)
+//                            self.safariViewController?.modalTransitionStyle = .crossDissolve
+//                            self.safariViewController?.modalPresentationStyle = .overCurrentContext
+//                            self.present(self.safariViewController!, animated: true) {
+//                                print("웹 present success")
+//                            }
+//                        }
                     }
                 }
             }

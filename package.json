@@ -1,6 +1,6 @@
 {
   "name": "@steadev/react-native-kakao-sdk",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "React Native Module for Kakao SDK (forked from @react-native-seoul/kakao-login@4.2.3)",
   "main": "index.js",
   "types": "index.d.ts",
