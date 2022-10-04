@@ -6,12 +6,8 @@ forked from [@react-native-seoul/kakao-login@4.2.3](https://www.npmjs.com/packag
 
 Supports `Kakao Sync`, `Kakao link`, `loginWithNewScopes`(추가항목 동의받기)
 
-Android Kakao SDK version: 2.11.1<br />
+Android Kakao SDK version: 2.11.0<br />
 iOS Kakao SDK version: 2.11.1<br />
-
-## Updates
-
-- 2022-10-04 update kakao sdk version to 2.11.1
 
 ## Archive Error
 
