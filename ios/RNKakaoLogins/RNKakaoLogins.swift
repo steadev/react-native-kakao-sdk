@@ -303,19 +303,15 @@ class RNKakaoLogins: NSObject {
                             }
                         }
                     } else {
-                        reject("isKakaoTalkSharingAvailable", "false", nil)
-                        // 카카오톡 미설치: 웹 공유 사용 권장
-                        // Custom WebView 또는 디폴트 브라우져 사용 가능
-                        // 웹 공유 예시 코드
-//                        if let url = ShareApi.shared.makeDefaultUrl(templateObject: templateJsonObject) {
-//
-//                            self.safariViewController = SFSafariViewController(url: url)
-//                            self.safariViewController?.modalTransitionStyle = .crossDissolve
-//                            self.safariViewController?.modalPresentationStyle = .overCurrentContext
-//                            self.present(self.safariViewController!, animated: true) {
-//                                print("웹 present success")
-//                            }
-//                        }
+                        if let url = ShareApi.shared.makeDefaultUrl(templateObject: templateJsonObject) {
+                            if UIApplication.shared.canOpenURL(url) {
+                                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                                resolve(["result": true])
+                            } else {
+                                reject("E_KAKAO_BROWSER_ERROR", "", nil)
+                                return
+                            }
+                        }
                     }
                 }
             }
