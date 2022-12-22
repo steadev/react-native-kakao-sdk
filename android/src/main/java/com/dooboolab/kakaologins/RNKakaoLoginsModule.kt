@@ -218,18 +218,18 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
     }
 
     @ReactMethod
-    fun sendLinkFeed(params: Map<String, String>, promise: Promise) {
-        val imageLinkUrl = params["imageLinkUrl"]
-        val imageUrl: String = if (params["imageUrl"] === null) "" else params["imageUrl"]!!
-        val title: String = if (params["title"] === null) "" else params["title"]!!
-        val description = params["description"]
+    fun sendLinkFeed(params: ReadableMap, promise: Promise) {
+        val imageLinkUrl = getString(params, "imageLinkUrl")
+        val imageUrl: String = if (getString(params, "imageUrl") === null) "" else getString(params,"imageUrl")!!
+        val title: String = if (getString(params,"title") === null) "" else getString(params,"title")!!
+        val description = getString(params,"description")
         val buttonTitle: String =
-            if (params["buttonTitle"] === null) "" else params["buttonTitle"]!!
-        val imageWidth: Int? = params["imageWidth"]?.toInt()
-        val imageHeight: Int? = params["imageHeight"]?.toInt()
+            if (getString(params,"buttonTitle") === null) "" else getString(params,"buttonTitle")!!
+        val imageWidth: Int? = getInt(params,"imageWidth")
+        val imageHeight: Int? = getInt(params,"imageHeight")
 
         val link = Link(imageLinkUrl, imageLinkUrl, null, null)
-        val content = Content(title, imageUrl, link, description, imageWidth, imageHeight)
+        val content = Content(title, imageUrl = imageUrl, link = link, description = description, imageWidth=imageWidth, imageHeight=imageHeight)
         val buttons = ArrayList<Button>()
         buttons.add(Button(buttonTitle, link))
         val feed = FeedTemplate(content, null, null, buttons)
@@ -277,6 +277,14 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
         val kakaoAppKey = reactContext.resources.getString(
                 reactContext.resources.getIdentifier("kakao_app_key", "string", reactContext.packageName))
         init(reactContext, kakaoAppKey)
+    }
+
+    private fun getString(dict: ReadableMap, key: String): String? {
+        return if (dict.hasKey(key)) dict.getString(key) else null
+    }
+
+    private fun getInt(dict: ReadableMap, key: String): Int? {
+        return if (dict.hasKey(key)) dict.getInt(key) else null
     }
 
     private fun tokenAvailability(callback: (TokenStatus) -> Unit) {
