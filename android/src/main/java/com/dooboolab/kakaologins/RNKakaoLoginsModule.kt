@@ -234,46 +234,36 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
         buttons.add(Button(buttonTitle, link))
         val feed = FeedTemplate(content, null, null, buttons)
         if (ShareClient.instance.isKakaoTalkSharingAvailable(reactContext)) {
-            reactContext.currentActivity?.let {
-                ShareClient.instance
-                    .shareDefault(
-                        it,
-                        feed
-                    ) { shareResult: SharingResult?, error: Throwable? ->
-                        if (error != null) {
-                            promise.reject("RNKakaoLogins", "kakao link failed: $error")
-                        } else if (shareResult != null) {
-                            it.startActivity(shareResult.intent)
-                        }
-                        promise.resolve("succeed")
-                    }
+            ShareClient.instance.shareDefault(reactContext, feed) { sharingResult, error ->
+                if (error != null) {
+                    promise.reject("E_KAKAO_ERROR", error.message, error)
+                    return@shareDefault
+                } else {
+                    val map = Arguments.createMap()
+                    map.putBoolean("result", true)
+                    map.putString("intent", sharingResult?.intent.toString())
+                    sharingResult?.intent?.let { intent -> reactContext.startActivity(intent, null) }
+                    map.putString("warning", sharingResult?.warningMsg.toString())
+                    map.putString("argument", sharingResult?.argumentMsg.toString())
+                    promise.resolve(map)
+                    return@shareDefault
+                }
             }
         } else {
-            reactContext.currentActivity?.let {
-                // 카카오톡 미설치: 웹 공유 사용 권장
-                // 웹 공유 예시 코드
-                val sharerUrl = WebSharerClient.instance.makeDefaultUrl(feed)
-                var shareResult = true
-                // CustomTabs으로 웹 브라우저 열기
+            // 카카오톡 미설치: 웹 공유 사용 권장
+            // 웹 공유 예시 코드
+            val sharerUrl = WebSharerClient.instance.makeDefaultUrl(feed)
 
-                // 1. CustomTabsServiceConnection 지원 브라우저 열기
-                // ex) Chrome, 삼성 인터넷, FireFox, 웨일 등
+            // 1. CustomTabs으로 Chrome 브라우저 열기
+            try {
+                reactContext.currentActivity?.let { KakaoCustomTabsClient.openWithDefault(it, sharerUrl) }
+            } catch (e: UnsupportedOperationException) {
+                // 2. CustomTabs으로 디바이스 기본 브라우저 열기
                 try {
-                    KakaoCustomTabsClient.openWithDefault(it, sharerUrl)
-                    promise.resolve("succeed")
-                } catch(e: UnsupportedOperationException) {
-                    // CustomTabsServiceConnection 지원 브라우저가 없을 때 예외처리
-                    shareResult = false
-                }
-
-                // 2. CustomTabsServiceConnection 미지원 브라우저 열기
-                // ex) 다음, 네이버 등
-                try {
-                    KakaoCustomTabsClient.open(it, sharerUrl)
-                    promise.resolve("succeed")
+                    reactContext.currentActivity?.let { KakaoCustomTabsClient.open(it, sharerUrl) }
                 } catch (e: ActivityNotFoundException) {
-                    // 디바이스에 설치된 인터넷 브라우저가 없을 때 예외처리
-                    shareResult = false
+                    // 인터넷 브라우저가 없을 때 예외처리
+                    promise.reject("E_KAKAO_NO_BROWSER", e.message, e)
                 }
             }
         }
