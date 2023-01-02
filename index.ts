@@ -75,9 +75,10 @@ export const initializeKakao = async (): Promise<KakaoOAuthTokenStatusInfo> => {
   }
 }
 
-export const login = async (serviceTerms?: string[]): Promise<KakaoOAuthToken> => {
+/** @forceToLoginWithKakakoAccount 카톡 계정으로 로그인 (카톡앱으로 X) 강제 */ 
+export const login = async (serviceTerms?: string[], forceToLoginWithKakaoAccount = false): Promise<KakaoOAuthToken> => {
   try {
-    const result: KakaoOAuthToken = await RNKakaoLogins.login(serviceTerms);
+    const result: KakaoOAuthToken = await RNKakaoLogins.login(serviceTerms, forceToLoginWithKakaoAccount);
 
     return result;
   } catch (err) {
