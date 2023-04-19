@@ -23,6 +23,7 @@ export type KakaoOAuthToken = {
 
 export type KakaoAccessTokenInfo = {
   accessToken: string;
+  refreshToken: string;
   expiresIn: string;
 };
 
