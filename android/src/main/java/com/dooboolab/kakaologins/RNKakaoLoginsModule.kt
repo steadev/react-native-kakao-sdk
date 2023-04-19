@@ -152,6 +152,7 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
     @ReactMethod
     private fun getAccessToken(promise: Promise) {
         val accessToken = TokenManagerProvider.instance.manager.getToken()?.accessToken
+        val refreshToken = TokenManagerProvider.instance.manager.getToken()?.refreshToken
 
          UserApiClient.instance.accessTokenInfo { token, error: Throwable? ->
             if (error != null) {
@@ -163,6 +164,7 @@ class RNKakaoLoginsModule(private val reactContext: ReactApplicationContext) : R
                 val (expiresIn) = token
                 val map = Arguments.createMap()
                 map.putString("accessToken", accessToken.toString())
+                map.putString("refreshToken", refreshToken.toString())
                 map.putString("expiresIn", expiresIn.toString())
                 promise.resolve(map)
                 return@accessTokenInfo
